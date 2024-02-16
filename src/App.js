@@ -5,24 +5,40 @@ import { evaluate } from 'mathjs'
 const App =()=> {
   let [result, setResult] = useState('0');
   const handleClick = (e) => {
-    console.log(e.target.id)
-    if(result === '0' ){
-      setResult("");
-      setResult(prevResult => prevResult + e.target.name)
-    } else {
-      setResult(prevResult => prevResult + e.target.name)
+    const { name } = e.target;
+
+    if (name === '.') {
+      // If the current result already contains a decimal point, ignore the click event
+      if (result.includes('.')) {
+        return;
+      }
     }
-  }
-  const calculate =() => {
-    const hasOperators = /[+\-*/]/.test(result);
-    if(hasOperators){
+
+
+
+    
+
+    if (result === '0') {
+      // If the current result is '0', replace it with the new input
+      setResult(name);
+    } else if (!(result === '0' && name === '0')) {
+      // If the result is not '0' or the input is not '0', append the input
+      setResult(prevResult => prevResult + name);
+    }
+  };
+
+  const calculate = () => {
+    try {
       setResult(evaluate(result));
-    }else{
+    } catch (error) {
       setResult('0');
     }
-  }
-  const clear =() => {
-    setResult(0);
+
+    
+  };
+
+  const clear = () => {
+    setResult('0');
   }
   return (
    <div className="calculator">
