@@ -2,44 +2,51 @@ import React, { useState } from 'react';
 import './App.css';
 import { evaluate } from 'mathjs'
 
-const App =()=> {
+const App =() => {
   let [result, setResult] = useState('0');
-  const handleClick = (e) => {
-    const { name } = e.target;
 
-    if (name === '.') {
-      // If the current result already contains a decimal point, ignore the click event
-      if (result.includes('.')) {
+  // Added a state to keep track of the last input type
+  const [lastInputType, setLastInputType] = useState('number');
+
+  const handleClick = (e) => {
+    const { name } = e.target; 
+    
+    if (name === '.' || name === '0') {
+      // If the current result ends with a decimal point or '0', ignore the click event
+      if (result.endsWith('.') || (result.endsWith('0') && lastInputType === 'number')) {
         return;
       }
     }
 
-
-
-    
-
-    if (result === '0') {
-      // If the current result is '0', replace it with the new input
+    if (result === '0' && lastInputType === 'number') {
+      // If the current result is '0' and last input type is number, replace it with the new input
       setResult(name);
-    } else if (!(result === '0' && name === '0')) {
+    } else {
       // If the result is not '0' or the input is not '0', append the input
       setResult(prevResult => prevResult + name);
     }
+
+    setLastInputType(name === '.' ? 'dot' : 'number');
   };
 
   const calculate = () => {
     try {
-      setResult(evaluate(result));
+      const result = evaluate(result);
+      if (!isNaN(result)) {
+        setResult(result);
+      } else {
+        setResult('Invalid operation');
+      }
     } catch (error) {
-      setResult('0');
+      setResult('Invalid operation');
     }
-
-    
   };
 
   const clear = () => {
     setResult('0');
+    setLastInputType('number');
   }
+
   return (
    <div className="calculator">
     <div id="display">{result}</div>
